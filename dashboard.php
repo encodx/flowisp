@@ -1,81 +1,101 @@
 <?php
 session_start();
-
-// If the user is not logged in, redirect to the login page...
 if (!isset($_SESSION['loggedin'])) {
-	header('Location: index.php');
-	exit;
+    header('Location: index.php');
+    exit;
 }
 
-// Dummy data for the dashboard
-$data = [
-    'total_clients' => 1250,
-    'running_clients' => 980,
-    'inactive_clients' => 150,
-    'free_clients' => 20,
-    'new_clients' => 55,
-    'renewed_clients' => 210,
-    'deactivated_clients' => 45,
-    'left_clients' => 30,
-    'total_billing_clients' => 1230,
-    'paid_clients' => 1100,
-    'total_unpaid_clients' => 130,
-    'rejected_clients' => 15,
-    'billing_expired_clients' => 75,
-    'unpaid_extension_clients' => 10,
-    'pending_tickets' => 25,
-    'processing_tickets' => 12,
-    'complete_tickets' => 150,
-    'daily_attendance' => 45,
-    'absent' => 5,
-    'leave_weekend' => 10,
-    'paid_salary' => '5,50,000 BDT',
-    'monthly_problem_occurrence' => [/* Graph data here */],
-    'most_problems_solved' => 'Network Team',
-    'monthly_new_clients' => 120,
-    'top_20_unpaid_clients' => [ /* Array of clients */ ],
-    'total_monthly_bill' => '12,30,000 BDT',
-    'collected_bill' => '11,00,000 BDT',
-    'total_due' => '1,30,000 BDT',
-    'sms_balance' => 5000,
-    'purchases_paid_amount' => '2,50,000 BDT',
-    'cash_on_hand' => '75,000 BDT'
+// Static data for demonstration
+$stats = [
+    ['title' => 'Total Client', 'value' => '1,250', 'icon' => 'fa-users', 'color' => 'bg-blue'],
+    ['title' => 'Running Clients', 'value' => '1,100', 'icon' => 'fa-person-running', 'color' => 'bg-green'],
+    ['title' => 'Inactive Clients', 'value' => '150', 'icon' => 'fa-wifi', 'color' => 'bg-yellow'],
+    ['title' => 'Free Clients', 'value' => '25', 'icon' => 'fa-user-plus', 'color' => 'bg-cyan'],
+    ['title' => 'New Clients', 'value' => '50', 'icon' => 'fa-user-plus', 'color' => 'bg-purple'],
+    ['title' => 'Renewed Clients', 'value' => '350', 'icon' => 'fa-sync', 'color' => 'bg-pink'],
+    ['title' => 'Deactivated Clients', 'value' => '10', 'icon' => 'fa-user-gear', 'color' => 'bg-orange'],
+    ['title' => 'Left Clients', 'value' => '5', 'icon' => 'fa-user-minus', 'color' => 'bg-red'],
+    ['title' => 'Total Billing Clients', 'value' => '1,225', 'icon' => 'fa-file-invoice', 'color' => 'bg-teal'],
+    ['title' => 'Paid Clients', 'value' => '1,050', 'icon' => 'fa-money-bill-wave', 'color' => 'bg-lime'],
+    ['title' => 'Total Unpaid Clients', 'value' => '175', 'icon' => 'fa-exclamation-triangle', 'color' => 'bg-dark-red'],
+    ['title' => 'Rejected Clients', 'value' => '2', 'icon' => 'fa-user-xmark', 'color' => 'bg-red'],
+    ['title' => 'Billing Expired Clients', 'value' => '30', 'icon' => 'fa-calendar-times', 'color' => 'bg-indigo'],
+    ['title' => 'Unpaid Extension', 'value' => '15', 'icon' => 'fa-calendar-plus', 'color' => 'bg-orange'],
 ];
 
 include 'layout/header.php';
 include 'layout/sidebar.php';
-
 ?>
-
-        <div class="main-content">
-            <h1>Dashboard</h1>
-
-            <h2>Client Related</h2>
-            <div class="widgets">
-                <div class="widget"><h4>Total Clients</h4><div class="value"><?= $data['total_clients'] ?></div></div>
-                <div class="widget"><h4>Running Clients</h4><div class="value"><?= $data['running_clients'] ?></div></div>
-                <div class="widget"><h4>Inactive Clients</h4><div class="value"><?= $data['inactive_clients'] ?></div></div>
-                 <div class="widget"><h4>Paid Clients</h4><div class="value"><?= $data['paid_clients'] ?></div></div>
-                <div class="widget"><h4>Total Unpaid Clients</h4><div class="value"><?= $data['total_unpaid_clients'] ?></div></div>
-            </div>
-
-            <h2>Support & Ticket</h2>
-             <div class="widgets">
-                <div class="widget"><h4>Pending Tickets</h4><div class="value"><?= $data['pending_tickets'] ?></div></div>
-                <div class="widget"><h4>Processing Tickets</h4><div class="value"><?= $data['processing_tickets'] ?></div></div>
-                <div class="widget"><h4>Complete Tickets</h4><div class="value"><?= $data['complete_tickets'] ?></div></div>
-            </div>
-
-            <h2>Billing & Finance</h2>
-            <div class="widgets">
-                <div class="widget"><h4>Total Monthly Bill</h4><div class="value"><?= $data['total_monthly_bill'] ?></div></div>
-                <div class="widget"><h4>Collected Bill</h4><div class="value"><?= $data['collected_bill'] ?></div></div>
-                <div class="widget"><h4>Total Due</h4><div class="value"><?= $data['total_due'] ?></div></div>
-                <div class="widget"><h4>Cash On Hand</h4><div class="value"><?= $data['cash_on_hand'] ?></div></div>
-            </div>
-
+<!-- Main Header -->
+<header class="header">
+    <div class="search-box">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Search clients, tickets...">
+    </div>
+    <div class="header-right">
+        <a href="#" class="header-btn"><i class="fa-solid fa-wifi"></i> Online Monitor</a>
+        <a href="#" class="header-btn"><i class="fa-solid fa-ticket"></i> Open Ticket</a>
+        <a href="#" class="header-btn support"><i class="fa-solid fa-headset"></i> Support</a>
+        <i class="fa-regular fa-bell"></i>
+        <div class="user-profile">
+            <img src="https://via.placeholder.com/40" alt="User">
         </div>
     </div>
+</header>
+
+<!-- Main dashboard content -->
+<div class="stats-grid">
+    <?php foreach ($stats as $stat): ?>
+    <div class="stat-card <?= $stat['color'] ?>">
+        <h3><?= $stat['title'] ?></h3>
+        <p><?= $stat['value'] ?></p>
+        <i class="fa-solid <?= $stat['icon'] ?> stat-icon"></i>
+    </div>
+    <?php endforeach; ?>
+</div>
+
+<div class="charts-section">
+    <div class="chart-container">
+        <!-- Chart will be here -->
+        <h3>Monthly New Clients</h3>
+        <p>A chart showing the trend of new client acquisitions over the past months.</p>
+        <!-- Placeholder for chart -->
+        <canvas id="monthlyClientsChart"></canvas>
+    </div>
+    <div class="unpaid-clients">
+        <!-- Unpaid clients list will be here -->
+        <h3>Top 5 Unpaid Clients</h3>
+    </div>
+</div>
+
+</main> <!--- closes main-content -->
+</div> <!--- closes wrapper -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Basic Chart.js implementation
+const ctx = document.getElementById('monthlyClientsChart');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [{
+            label: 'New Clients',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            fill: true,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
 
 </body>
 </html>
