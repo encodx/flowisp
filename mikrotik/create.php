@@ -1,37 +1,14 @@
 <?php
 session_start();
+require_once '../database.php'; // Include the database connection
 
 if (!isset($_SESSION['loggedin'])) {
     header('Location: ../index.php');
     exit;
 }
 
-/**
- * Simulates testing a connection to a MikroTik router.
- * 
- * !!! IMPORTANT !!!
- * This is a placeholder function. For a real implementation, you need to use a MikroTik API library 
- * like 'pearl/routeros-api'. You should install it via Composer:
- * `composer require pearl/routeros-api`
- * 
- * Then, you would replace the logic below with actual API connection code.
- *
- * require '../vendor/autoload.php';
- * use Pearl\RouterOS\Client;
- * use Pearl\RouterOS\Query;
- *
- * try {
- *     $client = new Client($ip, $user, $pass);
- *     // Connection is successful if no exception is thrown
- *     return true; 
- * } catch (\Exception $e) {
- *     // Log error: $e->getMessage();
- *     return false;
- * }
- */
+// The testMikroTikConnection function remains a simulation
 function testMikroTikConnection($ip, $user, $pass) {
-    // Placeholder: In a real scenario, this would attempt a real connection.
-    // For this demo, we'll just check if the fields are not empty.
     return !empty($ip) && !empty($user) && !empty($pass);
 }
 
@@ -41,40 +18,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // "Test" the connection
     if (testMikroTikConnection($ip_address, $username, $password)) {
-        // Initialize server list if it doesn't exist
-        if (!isset($_SESSION['servers'])) {
-            $_SESSION['servers'] = [];
+        try {
+            $sql = "INSERT INTO mikrotik_servers (name, ip_address, username, password) VALUES (:name, :ip, :user, :pass)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':name' => $name,
+                ':ip'   => $ip_address,
+                ':user' => $username,
+                ':pass' => $password // Storing plain password - NOT recommended for production
+            ]);
+            $_SESSION['message'] = "Server '{$name}' added successfully!";
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Database error: Could not add server. " . $e->getMessage();
         }
-
-        // Create new server array
-        $new_server = [
-            'id' => count($_SESSION['servers']) + 1,
-            'name' => $name,
-            'ip' => $ip_address,
-            // We won't store the username and password in the session for this example
-            // but you would store them securely in a database.
-            'status' => 'Connected' // Assume connected since our test passed
-        ];
-
-        // Add to the list of servers
-        $_SESSION['servers'][] = $new_server;
-        
-        // Set a success message
-        $_SESSION['message'] = "Server '{$name}' added successfully!";
-
     } else {
-        // Set an error message
-        $_SESSION['error'] = "Failed to connect to MikroTik server '{$name}'. Please check credentials and network.";
+        $_SESSION['error'] = "Failed to connect to MikroTik Server '{$name}'. Please check details.";
     }
     
-    // Redirect back to the server list
     header('Location: index.php');
     exit;
 
 } else {
-    // If not a POST request, redirect to the form
     header('Location: new.php');
     exit;
 }

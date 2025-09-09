@@ -1,20 +1,24 @@
 <?php
 session_start();
+require_once '../database.php'; // Include the database connection
 
 if (!isset($_SESSION['loggedin'])) {
     header('Location: ../index.php');
     exit;
 }
 
-// Use the list from the session, or initialize it if it doesn't exist.
-$olts = $_SESSION['olts'] ?? [];
+// Fetch OLTs from the database
+try {
+    $stmt = $pdo->query("SELECT id, name, model, ip_address FROM olts ORDER BY created_at DESC");
+    $olts = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $olts = [];
+    $_SESSION['error'] = "Database error: Could not fetch OLTs.";
+}
 
 $message = $_SESSION['message'] ?? null;
 $error = $_SESSION['error'] ?? null;
-
-// Clear the messages after displaying them
-unset($_SESSION['message']);
-unset($_SESSION['error']);
+unset($_SESSION['message'], $_SESSION['error']);
 
 include '../layout/header.php';
 include '../layout/sidebar.php';
@@ -55,8 +59,8 @@ include '../layout/sidebar.php';
                     <td><?= htmlspecialchars($olt['id']) ?></td>
                     <td><?= htmlspecialchars($olt['name']) ?></td>
                     <td><?= htmlspecialchars($olt['model']) ?></td>
-                    <td><?= htmlspecialchars($olt['ip']) ?></td>
-                    <td><?= htmlspecialchars($olt['status']) ?></td>
+                    <td><?= htmlspecialchars($olt['ip_address']) ?></td>
+                    <td><span class="status-online">Online</span></td> <!-- Static status -->
                     <td>
                         <a href="#" class="action-btn edit-btn">Manage</a>
                         <a href="#" class="action-btn delete-btn">Delete</a>

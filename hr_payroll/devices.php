@@ -1,20 +1,24 @@
 <?php
 session_start();
+require_once '../database.php'; // Include the database connection
 
 if (!isset($_SESSION['loggedin'])) {
     header('Location: ../index.php');
     exit;
 }
 
-// Use the list from the session, or initialize it if it doesn't exist.
-$devices = $_SESSION['devices'] ?? [];
+// Fetch devices from the database
+try {
+    $stmt = $pdo->query("SELECT id, name, ip_address, port FROM attendance_devices ORDER BY created_at DESC");
+    $devices = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $devices = [];
+    $_SESSION['error'] = "Database error: Could not fetch devices.";
+}
 
 $message = $_SESSION['message'] ?? null;
 $error = $_SESSION['error'] ?? null;
-
-// Clear the messages after displaying them
-unset($_SESSION['message']);
-unset($_SESSION['error']);
+unset($_SESSION['message'], $_SESSION['error']);
 
 include '../layout/header.php';
 include '../layout/sidebar.php';
@@ -53,8 +57,8 @@ include '../layout/sidebar.php';
                 <tr>
                     <td><?= htmlspecialchars($device['id']) ?></td>
                     <td><?= htmlspecialchars($device['name']) ?></td>
-                    <td><?= htmlspecialchars($device['ip']) ?></td>
-                    <td><?= htmlspecialchars($device['status']) ?></td>
+                    <td><?= htmlspecialchars($device['ip_address']) ?></td>
+                    <td><span class="status-online">Online</span></td> <!-- Static status -->
                     <td>
                         <a href="#" class="action-btn">Sync Attendance</a>
                         <a href="#" class="action-btn edit-btn">Edit</a>
