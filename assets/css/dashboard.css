@@ -14,6 +14,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--main-bg);
     color: var(--text-color);
+    margin: 0;
 }
 
 .wrapper {
@@ -59,12 +60,22 @@ body {
     transition: background-color 0.2s, color 0.2s;
 }
 
-.sidebar-menu li a:hover,
 .sidebar-menu li.active > a {
     background-color: #1a3a69;
     color: var(--sidebar-active);
     border-left: 3px solid var(--primary-blue);
+    padding-left: 17px;
 }
+
+.sidebar-menu li a:hover {
+     background-color: #1a3a69;
+     color: var(--sidebar-active);
+}
+
+.sidebar-menu li.active > a:hover {
+    background-color: #1a3a69;
+}
+
 
 .sidebar-menu li a .fa-solid {
     width: 25px;
@@ -72,6 +83,57 @@ body {
     margin-right: 15px;
     font-size: 16px;
 }
+
+/* Submenu Styles */
+.sidebar-menu .has-submenu > a {
+    justify-content: space-between;
+}
+
+.sidebar-menu .arrow {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-menu .has-submenu.open > a .arrow {
+    transform: rotate(90deg);
+}
+
+.submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+    background-color: #061224;
+}
+
+.submenu li a {
+    padding-left: 57px; /* 20px + 25px + 12px */
+    font-size: 14px;
+    position: relative;
+}
+
+.submenu li a::before {
+    content: '';
+    position: absolute;
+    left: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 5px;
+    background-color: var(--sidebar-text);
+    border-radius: 50%;
+}
+
+.sidebar-menu .submenu li a:hover,
+.sidebar-menu .submenu li.active a {
+    color: var(--sidebar-active);
+}
+
+.sidebar-menu .submenu li a:hover::before,
+.sidebar-menu .submenu li.active a::before {
+    background-color: var(--sidebar-active);
+}
+
 
 /* Main Content */
 .main-content {
