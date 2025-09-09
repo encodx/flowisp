@@ -1,78 +1,105 @@
 <?php
 session_start();
-require_once '../database.php'; // Include the database connection
-
 if (!isset($_SESSION['loggedin'])) {
     header('Location: ../index.php');
     exit;
 }
 
-// Fetch servers from the database
-try {
-    $stmt = $pdo->query("SELECT id, name, ip_address FROM mikrotik_servers ORDER BY created_at DESC");
-    $servers = $stmt->fetchAll();
-} catch (PDOException $e) {
-    // If there is a database error, you might want to show a message.
-    $servers = [];
-    $_SESSION['error'] = "Database error: Could not fetch servers.";
-}
+// Include the necessary files
+include __DIR__ . '/../layout/header.php';
+include __DIR__ . '/../layout/sidebar.php';
+include __DIR__ . '/../includes/MikrotikAPI.php';
 
-$message = $_SESSION['message'] ?? null;
-$error = $_SESSION['error'] ?? null;
-unset($_SESSION['message'], $_SESSION['error']);
+// Dummy data for MikroTik servers
+// In a real application, this would come from a database
+$servers = [
+    [
+        'name' => 'Main Router',
+        'ip' => '103.149.23.130',
+        'username' => 'support',
+        'password' => 'suPPort@246%^*',
+    ],
+    [
+        'name' => 'Secondary Router',
+        'ip' => '192.168.88.2', // An example of an offline/unreachable router
+        'username' => 'admin',
+        'password' => 'password',
+    ],
+     [
+        'name' => 'Test Router',
+        'ip' => '103.149.23.130', // Wrong credentials example
+        'username' => 'wronguser',
+        'password' => 'wrongpass',
+    ],
+];
 
-include '../layout/header.php';
-include '../layout/sidebar.php';
 ?>
 
-<div class="main-content">
-    <h2>Mikrotik Server Management</h2>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="text-dark">MikroTik Servers</h3>
+        <button class="btn btn-primary">+ Add New Server</button>
+    </div>
 
-    <?php if ($message): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
-    <?php endif; ?>
-    <?php if ($error): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+    <div class="row">
+        <?php foreach ($servers as $server): ?>
+            <?php
+                // Establish connection
+                $api = new MikrotikAPI($server['ip'], $server['username'], $server['password']);
+                $resources = null;
+                if ($api->isConnected()) {
+                    $resources = $api->getResources();
+                }
+            ?>
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm mikrotik-card status-<?= ($api->isConnected() ? 'online' : 'offline') ?>">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="card-title mb-1"><?= htmlspecialchars($server['name']) ?></h5>
+                            <span class="badge status-badge">
+                                <?= ($api->isConnected() ? 'Online' : 'Offline') ?>
+                            </span>
+                        </div>
+                        <p class="card-subtitle mb-2 text-muted"><?= htmlspecialchars($server['ip']) ?></p>
+                        <hr>
+                        
+                        <?php if ($api->isConnected() && $resources): ?>
+                            <div class="row server-info">
+                                <div class="col-6">
+                                    <small class="text-muted">Uptime</small>
+                                    <p><?= htmlspecialchars($resources['uptime']) ?></p>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">CPU Load</small>
+                                    <p><?= htmlspecialchars($resources['cpu-load']) ?>%</p>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Board Name</small>
+                                    <p><?= htmlspecialchars($resources['board-name']) ?></p>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Version</small>
+                                    <p><?= htmlspecialchars($resources['version']) ?></p>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center text-muted pt-4">
+                                <i class="fa-solid fa-circle-xmark fa-2x mb-2"></i>
+                                <p>Could not connect to the router. Please check IP and credentials.</p>
+                            </div>
+                        <?php endif; ?>
 
-    <a href="new.php" class="add-btn">Add New Server</a>
-
-    <h3>Server List</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Server Name</th>
-                <th>IP Address</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($servers)): ?>
-                <tr>
-                    <td colspan="5" style="text-align:center;">No servers found. Add one to get started.</td>
-                </tr>
-            <?php else: ?>
-                <?php foreach ($servers as $server): ?>
-                <tr>
-                    <td><?= htmlspecialchars($server['id']) ?></td>
-                    <td><?= htmlspecialchars($server['name']) ?></td>
-                    <td><?= htmlspecialchars($server['ip_address']) ?></td>
-                    <td>
-                        <span class="status-online">Online</span> <!-- Status is static for now -->
-                    </td>
-                    <td>
-                        <a href="#" class="action-btn edit-btn">Manage</a>
-                        <a href="#" class="action-btn delete-btn">Delete</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                    </div>
+                    <div class="card-footer bg-light">
+                         <a href="#" class="btn btn-sm btn-outline-primary">Details</a>
+                         <a href="#" class="btn btn-sm btn-outline-secondary">Configure</a>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
 </div>
 
-</div><!-- closes the container div from header -->
-</body>
-</html>
+<?php
+include __DIR__ . '/../layout/footer.php';
+?>

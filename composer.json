@@ -1,0 +1,14 @@
+{
+    "name": "php-isp-project/core",
+    "description": "A custom ISP management panel.",
+    "type": "project",
+    "require": {
+        "pear/routeros_api": "^1.1"
+    },
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "you@example.com"
+        }
+    ]
+}
