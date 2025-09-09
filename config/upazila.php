@@ -7,10 +7,10 @@ if (!isset($_SESSION['loggedin'])) {
 }
 
 // Dummy Data
-$connection_types = [
-    ['id' => 1, 'name' => 'Home User'],
-    ['id' => 2, 'name' => 'Corporate User'],
-    ['id' => 3, 'name' => 'Reseller'],
+$upazilas = [
+    ['id' => 1, 'name' => 'Mirpur', 'district' => 'Dhaka'],
+    ['id' => 2, 'name' => 'Pahartali', 'district' => 'Chittagong'],
+    ['id' => 3, 'name' => 'Daulatpur', 'district' => 'Khulna'],
 ];
 
 include '../layout/header.php';
@@ -20,8 +20,8 @@ include '../layout/sidebar.php';
 <div class="main-content">
     <div class="card">
         <div class="card-header">
-            <h4>Connection Types</h4>
-            <a href="#" class="btn btn-primary">Add New Connection Type</a>
+            <h4>Upazilas</h4>
+            <a href="#" class="btn btn-primary">Add New Upazila</a>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -30,14 +30,16 @@ include '../layout/sidebar.php';
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>District</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($connection_types as $connection_type): ?>
+                        <?php foreach ($upazilas as $upazila): ?>
                             <tr>
-                                <td><?php echo $connection_type['id']; ?></td>
-                                <td><?php echo $connection_type['name']; ?></td>
+                                <td><?php echo $upazila['id']; ?></td>
+                                <td><?php echo $upazila['name']; ?></td>
+                                <td><?php echo $upazila['district']; ?></td>
                                 <td>
                                     <a href="#" class="btn btn-sm btn-info">Edit</a>
                                     <a href="#" class="btn btn-sm btn-danger">Delete</a>
